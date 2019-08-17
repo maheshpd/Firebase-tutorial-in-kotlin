@@ -1,14 +1,12 @@
 package com.example.firebaseauthtutorialinkotlin
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_login.edit_text_password
-import kotlinx.android.synthetic.main.activity_login.text_email
-import kotlinx.android.synthetic.main.activity_register.*
 
 class LoginActivity : AppCompatActivity() {
 
@@ -41,11 +39,35 @@ class LoginActivity : AppCompatActivity() {
                 edit_text_password.requestFocus()
                 return@setOnClickListener
             }
+
+            loginUser(email,password)
         }
 
 
         text_view_register.setOnClickListener {
             startActivity(Intent(this@LoginActivity,RegisterActivity::class.java))
+        }
+    }
+
+    private fun loginUser(email: String, password: String) {
+        progressbar.visibility = View.VISIBLE
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this) { task ->
+            progressbar.visibility = View.GONE
+            if (task.isSuccessful) {
+                login()
+            }else {
+                task.exception?.message?.let {
+                    toast(it)
+                }
+            }
+        }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mAuth.currentUser?.let {
+            login()
         }
     }
 }
